@@ -8,7 +8,7 @@ output: html_document
 1A
 
 ```{r setup, include=TRUE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 library(ggplot2)
 library(dplyr)
 library(readr)
