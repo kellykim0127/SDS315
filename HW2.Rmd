@@ -1,0 +1,206 @@
+---
+title: "HW2"
+author: "Kelly Kim"
+date: "2024-01-30"
+output: html_document
+---
+
+1A
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+library(readr)
+profs<-read_csv("profs.csv")
+ggplot(profs, aes(eval)) + geom_histogram(binwidth = 0.25, fill = "skyblue") +
+  labs(title = "Distribution of Course Evaluation Scores",
+       x = "Evaluation Score",
+       y = "Frequency") +
+  theme_minimal()
+```
+
+1B
+
+```{r}
+ggplot(profs, aes(x = factor(native), y = eval, fill = factor(native))) +
+  geom_boxplot() +
+  labs(title = "Distribution of Course Evaluation Scores by Native English Speaker Status",
+       x = "Native English Speaker",
+       y = "Evaluation") +
+  theme_minimal()
+```
+
+1C
+
+```{r}
+ggplot(profs, aes(eval)) +
+  geom_histogram(binwidth = 0.25, fill = "skyblue") +
+  facet_grid(. ~ gender) +
+  labs(title = "Distribution of Course Evaluation Scores by Gender",
+       x = "Evaluation Score",
+       y = "Frequency") +
+  theme_minimal()
+
+```
+
+1D
+
+```{r}
+ggplot(profs, aes(x = beauty, y = eval)) +
+  geom_point(alpha = 0.5, color = "skyblue") +
+  labs(title = "Association Between Professor's Physical Attractiveness and Course Evaluations",
+       x = "Physical Attractiveness Rating",
+       y = "Evaluation") +
+  theme_minimal()
+```
+
+2A
+
+```{r}
+bikeshare<-read_csv("bikeshare.csv")
+ggplot(bikeshare, aes(x = hr, y = total)) +
+  geom_line(color = "skyblue") +
+  labs(title = "Average Hourly Bike Rentals Across All Hours of the Day",
+       x = "Hour of the Day",
+       y = "Average Bike Rentals") +
+  theme_minimal()
+```
+
+2B
+
+```{r}
+ggplot(bikeshare, aes(x = hr, y = total)) +
+  stat_summary(fun = "mean", geom = "line", aes(group = workingday),
+               color = "skyblue") +
+  facet_grid(. ~ workingday) +
+  labs(title = "Average Bike Rentals by Hour of the Day, Faceted by Working Day",
+       x = "Hour of the Day",
+       y = "Average Bike Rentals") +
+  theme_minimal()
+```
+
+2C
+
+```{r}
+bikeshare_filtered <- bikeshare %>%
+  select(hr, weathersit, total, workingday) %>%
+  filter(hr == 9)
+
+ggplot(bikeshare_filtered, aes(x = factor(weathersit), fill = factor(workingday))) +
+  geom_bar(position = "dodge") +
+  facet_grid(. ~ workingday) +
+  labs(title = "Average Bike Rentals During 9 AM by Weather Situation and Working Day",
+       x = "Weather Situation",
+       y = "Total Rentals") +
+  theme_minimal()
+```
+
+3A
+
+```{r}
+library(dplyr)
+library(ggplot2)
+capmetro_UT<-read_csv("capmetro_UT.csv")
+capmetro_UT <- mutate(capmetro_UT,
+                      day_of_week = factor(day_of_week, levels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")),
+                      month = factor(month, levels = c("Sep", "Oct", "Nov")))
+
+average_boardings_data <- capmetro_UT %>%
+  group_by(day_of_week, month, hour_of_day) %>%
+  summarise(avg_boardings = mean(boarding))
+
+ggplot(average_boardings_data, aes(x = hour_of_day, y = avg_boardings, color = month)) +
+  geom_line() +
+  facet_grid(day_of_week ~ ., scales = "free_y") +
+  labs(
+    title = "Average Boardings by Hour of the Day, Day of the Week, and Month",
+    x = "Hour of the Day",
+    y = "Average Boardings",
+    color = "Month"
+  ) +
+  theme_minimal()
+```
+
+3B
+
+```{r}
+scatter_data <- capmetro_UT %>%
+  group_by(hour_of_day, weekend) %>%
+  summarise(avg_boardings = mean(boarding),
+            avg_temperature = mean(temperature))
+
+ggplot(scatter_data, aes(x = avg_temperature, y = avg_boardings, color = weekend)) +
+  geom_point() +
+  facet_wrap(~hour_of_day) +
+  labs(
+    title = "Boardings vs. Temperature by Hour of the Day and Weekend Status",
+    x = "Average Temperature (°F)",
+    y = "Average Boardings",
+    color = "Weekend"
+  ) +
+  theme_minimal()
+```
+
+4A
+
+```{r}
+billboard<-read.csv("billboard.csv")
+top_songs_table <- billboard %>%
+  group_by(performer, song) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>%
+  head(10)
+
+top_songs_table
+```
+
+4B
+
+```{r}
+musical_diversity_data <- billboard %>%
+  filter(year != 1958 & year != 2021) %>%  
+  group_by(year, song) %>%
+  summarise() %>%
+  group_by(year) %>%
+  summarise(musical_diversity = n())
+
+ggplot(musical_diversity_data, aes(x = year, y = musical_diversity)) +
+  geom_line(color = "skyblue") +
+  labs(title = "Musical Diversity of Billboard Top 100 Over the Years",
+       x = "Year",
+       y = "Number of Unique Songs") +
+  theme_minimal()
+```
+
+4C
+
+
+```{r, echo=TRUE}
+library(dplyr)
+library(ggplot2)
+
+ten_week_hits_data <- billboard %>%
+  filter(week_position <= 10) %>%
+  group_by(performer, song) %>%
+  summarise(ten_week_hits = n()) %>%
+  filter(ten_week_hits >= 10) %>%
+  group_by(performer) %>%
+  summarise(total_ten_week_hits = n()) %>%
+  filter(total_ten_week_hits >= 30) %>%
+  arrange(desc(total_ten_week_hits))
+
+ggplot(ten_week_hits_data, aes(x = reorder(performer, -total_ten_week_hits), y = total_ten_week_hits)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(
+    title = "Number of Ten-Week Hits for Top 19 Artists",
+    x = "Artist",
+    y = "Number of Ten-Week Hits"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
+
