@@ -4,6 +4,8 @@ author: "Kelly Kim"
 date: "2024-02-05"
 output: pdf_document
 ---
+Dokyung Kim(Kelly Kim)
+UT EID: dk29933
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
