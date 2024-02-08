@@ -1,0 +1,164 @@
+---
+title: "HW3"
+author: "Kelly Kim"
+date: "2024-02-05"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+
+```{r}
+library(readr)
+creatinine <- read_csv("creatinine.csv")
+library(tidyverse)
+library(mosaic)
+ggplot(creatinine) + 
+  geom_point(aes(x=age, y=creatclear)) + 
+  geom_smooth(aes(x=age, y=creatclear), method='lm')
+
+model_creatinine = lm(creatclear ~ age, data=creatinine)
+coef(model_creatinine)
+```
+creatclear = -0.6198(age) + 147.8129
+age = 55
+creatclear = -0.6198 * 55 + 147.8129 = 113.7239
+a) I drew a linear regression line to predict creatine clearance rate of a 55-year-old patient and plugged in 55 in the equation. 
+creatclear = -0.6198 * 55 + 147.8129 = 113.7239
+The predicted creatine clearance rate of a 55-year-old patient is 113.7239mL/minute.
+
+b) Creatinine clearance rate changes -0.6198ml/minute per year. I drew a linear regression line where x = age and y = clearance rate and the slope indicates how the clearance rate changes in average as the patient gets 1 year older. And the slope is -0.6198.
+
+c)age = 40
+-0.6198 * 40 + 147.8129 = 123.0209
+135
+age = 60
+-0.6198 * 60 + 147.8129 = 110.6249
+112
+The patient whose age is 40 years old is healthier for his/her age since the residual for him/her is 11.9791(135 - 123.0209) while the residual for the patient at 60 year-old is 1.3751 (112 - 110.6249). The residual of the 40-year-old patient is much larger than that of the 60-year-old patient, meaning that the 40-year-old patient has higher creatinine rate at his/her age than that of the 60-year-old patient.
+
+```{r}
+marketmodel <- read_csv("marketmodel.csv")
+library(tidyverse)
+library(mosaic)
+ggplot(marketmodel) + 
+  geom_point(aes(x=SPY, y=AAPL)) + 
+  geom_smooth(aes(x=SPY, y=AAPL), method='lm')
+model_AAPL = lm(AAPL ~ SPY, data=marketmodel)
+coef(model_AAPL)
+summary(model_AAPL)$r.squared 
+
+ggplot(marketmodel) + 
+  geom_point(aes(x=SPY, y=GOOG)) + 
+  geom_smooth(aes(x=SPY, y=GOOG), method='lm')
+model_GOOG = lm(GOOG ~ SPY, data=marketmodel)
+coef(model_GOOG)
+summary(model_GOOG)$r.squared 
+
+ggplot(marketmodel) + 
+  geom_point(aes(x=SPY, y=MRK)) + 
+  geom_smooth(aes(x=SPY, y=MRK), method='lm')
+model_MRK = lm(MRK ~ SPY, data=marketmodel)
+coef(model_MRK)
+summary(model_MRK)$r.squared 
+
+ggplot(marketmodel) + 
+  geom_point(aes(x=SPY, y=JNJ)) + 
+  geom_smooth(aes(x=SPY, y=JNJ), method='lm')
+model_JNJ = lm(JNJ ~ SPY, data=marketmodel)
+coef(model_JNJ)
+summary(model_JNJ)$r.squared 
+
+ggplot(marketmodel) + 
+  geom_point(aes(x=SPY, y=WMT)) + 
+  geom_smooth(aes(x=SPY, y=WMT), method='lm')
+model_WMT = lm(WMT ~ SPY, data=marketmodel)
+coef(model_WMT)
+summary(model_WMT)$r.squared 
+
+ggplot(marketmodel) + 
+  geom_point(aes(x=SPY, y=TGT)) + 
+  geom_smooth(aes(x=SPY, y=TGT), method='lm')
+model_TGT = lm(TGT ~ SPY, data=marketmodel)
+coef(model_TGT)
+summary(model_TGT)$r.squared 
+
+library(tibble)
+
+regression_data <- tibble(
+  Ticker = c("AAPL", "GOOG", "MRK", "JNJ", "WMT", "TGT"),
+  Intercept = c(0.009189277, 0.000233047, -0.000154021, -0.000024107, 0.00067811, 0.001583341),
+  Slope = c(1.065601182, 0.996774575, 0.713614091, 0.677193, 0.518981064, 0.707648462),
+  R_squared = c(0.01336246, 0.6483015, 0.483701, 0.501943, 0.2853233, 0.2478813)
+)
+
+print(regression_data)
+```
+Beta is a systematic risk that a company takes, showing how much of percentage of the stock return changes as market portfolio changes by 1%.
+Beta is calculated as the slope of the regression line, measuring how much the stock's returns change for a unit change in the market returns. A linear regression analysis where the dependent variable is the rate of return of the individual stock and the independent variable is the rate of return of the market(market portfolio increasing by 1%) is needed. 
+
+The slope variable indicates how much the stock's returns change as market portfolio increases by 1%. R^2 represents the proportion of variance in the stock's returns explained by changes in the market returns, with higher values indicating better fit. And the intercept represents the expected return of the stock when the market return is zero(no change in market portfolio).
+
+AAPL has the highest systematic risk whereas WMT has the lowest systematic risk.
+
+
+
+```{r}
+covid <- read_csv("covid.csv")
+italy <- subset(covid, country == "Italy")
+spain <- subset(covid, country == "Spain")
+
+lm_italy <- lm(log(deaths) ~ days_since_first_death, data = italy)
+
+slope_italy <- round(coef(lm_italy)[2], digits = 3)
+
+doubling_time_italy <- round(log(2) / slope_italy)
+
+print(doubling_time_italy)
+
+lm_spain <- lm(log(deaths) ~ days_since_first_death, data = spain)
+
+slope_spain <- round(coef(lm_spain)[2], digits = 3)
+
+doubling_time_spain <- round(log(2) / slope_spain)
+
+print(doubling_time_italy)
+
+ggplot(spain) +
+  geom_line(aes(x = days_since_first_death, y = log(deaths)), color = "blue") +
+  geom_smooth(aes(x = days_since_first_death, y = log(deaths)), method = "lm", se = FALSE, color = "blue") +
+
+  geom_line(data = italy, aes(x = days_since_first_death, y = log(deaths)), color = "red") +
+  geom_smooth(data = italy, aes(x = days_since_first_death, y = log(deaths)), method = "lm", se = FALSE, color = "red") +
+
+  labs(title = "COVID-19 Deaths: Spain vs Italy",
+       x = "Days Since First Death",
+       y = "Log(Deaths)") +
+  scale_color_manual(values = c("blue", "red")) +
+  theme_minimal()
+
+```
+
+An estimated growth rate for Italy is 0.183, and an estimated growth rate for Spain is 1.276. The doubling time for Italy is 4 and the doubling time for Spain is 3.
+
+```{r}
+
+milk <- read_csv("milk.csv", col_types = cols(price = col_double(), sales = col_integer()))
+
+
+ggplot(milk, aes(x = price, y = sales)) +
+  geom_line() +
+  labs(x = "Price", y = "Sales")
+
+lm_milk <- lm(sales ~ price, data = milk)
+
+coef(lm_milk)
+
+mean(milk$price)
+mean(milk$sales)
+
+```
+The price elasticity for milk is calculated by using the formula: coefficient of price * (average price/average sales). As the slope of the regression model where the sales is the dependent variable and the price is the independent variable is -13.78, the average price is 3.102069 and the average sales is 23.03448, the formula would be (-13.78) * (3.102069/23.03448) = -1.856, indicating that the estimated price elasticity of demand for milk is -1.856. People tend to buy less milk as the price of milk increases.
