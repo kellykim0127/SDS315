@@ -1,0 +1,191 @@
+---
+title: "HW5"
+author: "Kelly Kim"
+date: "2024-02-25"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+# Parameters
+num_simulations <- 100000
+num_trades <- 2021
+baseline_rate <- 0.024
+observed_flagged_trades <- 70
+
+# Monte Carlo simulation
+simulated_flagged_trades <- rbinom(num_simulations, num_trades, baseline_rate)
+
+# Calculate test statistic for each simulation
+test_statistics <- simulated_flagged_trades
+
+# Calculate p-value
+p_value <- mean(test_statistics >= observed_flagged_trades)
+
+# Plotting
+hist(test_statistics, breaks = 50, freq = FALSE, col = 'blue', xlab = 'Number of Flagged Trades', ylab = 'Probability Density', main = 'Distribution of Test Statistic')
+abline(v = observed_flagged_trades, col = 'red', lty = 2, lw = 2)
+
+# Print p-value
+cat("P-value:", p_value, "\n")
+
+```
+In conducting the Monte Carlo simulation, we aimed to test the null hypothesis that the rate of flagged trades for Iron Bank employees  is consistent with the baseline rate observed for other traders. We used the number of flagged trades  as our test statistic. The simulation results yielded a p-value of 0.00173, indicating that the observed rate of flagged trades is significantly different from the expected baseline rate. Therefore, based on the evidence provided by the simulation, we conclude the rate of flagged trades for Iron Bank employees is significantly different from the expected baseline rate of 2.4% for other traders. Thus there may be suspicious patterns of securities trading at the Iron Bank that violate federal insider trading laws.
+```{r}
+# Parameters
+num_simulations <- 100000
+num_inspections <- 50
+baseline_rate <- 0.03
+observed_violations <- 8
+
+# Monte Carlo simulation
+simulated_violations <- rbinom(num_simulations, num_inspections, baseline_rate)
+
+# Calculate test statistic for each simulation
+test_statistics <- simulated_violations
+
+# Calculate p-value
+p_value <- mean(test_statistics >= observed_violations)
+
+# Plotting
+hist(test_statistics, breaks = 20, freq = FALSE, col = 'blue', 
+     xlab = 'Number of Health Code Violations', ylab = 'Probability Density',
+     main = 'Distribution of Test Statistic')
+abline(v = observed_violations, col = 'red', lty = 2, lw = 2)
+
+# Print p-value
+cat("P-value:", p_value, "\n")
+
+```
+Based on the Monte Carlo simulation conducted with 100,000 simulations, the p-value calculated for the null hypothesis that Gourmet Bites' rate of health code violations is consistent with the citywide average rate of 3% is 0.0001. This p-value indicates strong evidence against the null hypothesis, suggesting that the observed rate of health code violations at Gourmet Bites is significantly higher than the citywide average. The distribution of the test statistic, representing the number of health code violations observed during inspections of Gourmet Bites, demonstrates a clear departure from what would be expected under the null hypothesis. Therefore, it is unlikely that the observed number of violations could be attributed solely to random chance. This conclusion suggests that Gourmet Bites may indeed have issues with health code compliance that warrant further attention from the Health Department, potentially leading to corrective action or intervention to address the elevated rate of violations.
+
+
+
+```{r}
+# Step 1: Read the sentences
+sentences <- readLines("brown_sentences.txt")
+letter_frequencies = read.csv("letter_frequencies.csv")
+
+# Step 2: Preprocess the text
+  # Remove non-letters and convert to uppercase
+  clean_sentence = gsub("[^A-Za-z]", "", "brown_sentences.txt")
+  clean_sentence = toupper(clean_sentence)
+  
+# Ensure letter frequencies are normalized and sum to 1
+  letter_frequencies$Probability = letter_frequencies$Probability / sum(letter_frequencies$Probability)
+  # Count the occurrences of each letter in the sentence
+  observed_counts = table(factor(strsplit(clean_sentence, "")[[1]], levels = letter_frequencies$Letter))
+   total_letters = sum(observed_counts)
+   expected_counts = total_letters * letter_frequencies$Probability
+   
+  chi_squared = (observed_counts/expected_counts)^2/(expected_counts)
+
+ print(chi_squared)
+  
+
+```
+
+```{r}
+ # Step 1: Read the sentences
+sentences <- readLines("brown_sentences.txt")
+letter_frequencies <- read.csv("letter_frequencies.csv")
+
+# Step 2: Preprocess the text
+# Assuming you have multiple sentences, you need to loop over each sentence
+chi_squared_values <- numeric(length(sentences))  # Initialize vector to store chi-squared values
+
+for (i in 1:length(sentences)) {
+  # Remove non-letters and convert to uppercase for each sentence
+  clean_sentence <- gsub("[^A-Za-z]", "", sentences[i])
+  clean_sentence <- toupper(clean_sentence)
+  
+  # Ensure letter frequencies are normalized and sum to 1
+  letter_frequencies$Probability <- letter_frequencies$Probability / sum(letter_frequencies$Probability)
+  
+  # Count the occurrences of each letter in the sentence
+  observed_counts <- table(factor(strsplit(clean_sentence, "")[[1]], levels = letter_frequencies$Letter))
+  
+  # Calculate total letters and expected counts
+  total_letters <- sum(observed_counts)
+  expected_counts <- total_letters * letter_frequencies$Probability
+  
+  # Calculate chi-squared value
+  chi_squared_values[i] <- sum((observed_counts - expected_counts)^2 / expected_counts)
+}
+
+# Plot histogram of chi-squared values
+hist(chi_squared_values, main = "Chi-Squared Distribution", xlab = "Chi-Squared Value", ylab = "Frequency")
+```
+p-value = sum(x^2(samples)>=x^2)/length(x^2samples)
+```{r}
+# Put the sentences into an R vector
+sentences <- c(
+  "She opened the book and started to read the first chapter, eagerly anticipating what might come next.",
+  "Despite the heavy rain, they decided to go for a long walk in the park, crossing the main avenue by the fountain in the center.",
+  "The museum’s new exhibit features ancient artifacts from various civilizations around the world.",
+  "He carefully examined the document, looking for any clues that might help solve the mystery.",
+  "The students gathered in the auditorium to listen to the guest speaker’s inspiring lecture.",
+  "Feeling vexed after an arduous and zany day at work, she hoped for a peaceful and quiet evening at home, cozying up after a quick dinner with some TV, or maybe a book on her upcoming visit to Auckland.",
+  "The chef demonstrated how to prepare a delicious meal using only locally sourced ingredients, focusing mainly on some excellent dinner recipes from Spain.",
+  "They watched the sunset from the hilltop, marveling at the beautiful array of colors in the sky.",
+  "The committee reviewed the proposal and provided many points of useful feedback to improve the project’s effectiveness.",
+  "Despite the challenges faced during the project, the team worked tirelessly to ensure its successful completion, resulting in a product that exceeded everyone’s expectations."
+)
+
+# Read letter frequencies from CSV
+letter_frequencies <- read.csv("letter_frequencies.csv")
+
+# Function to calculate chi-squared value for a sentence
+calculate_chi_squared <- function(sentence, letter_frequencies) {
+  # Remove non-letters and convert to uppercase
+  clean_sentence <- gsub("[^A-Za-z]", "", sentence)
+  clean_sentence <- toupper(clean_sentence)
+  
+  # Ensure letter frequencies are normalized and sum to 1
+  letter_frequencies$Probability <- letter_frequencies$Probability / sum(letter_frequencies$Probability)
+  
+  # Count the occurrences of each letter in the sentence
+  observed_counts <- table(factor(strsplit(clean_sentence, "")[[1]], levels = letter_frequencies$Letter))
+  
+  # Calculate total letters and expected counts
+  total_letters <- sum(observed_counts)
+  expected_counts <- total_letters * letter_frequencies$Probability
+  
+  # Calculate chi-squared value
+  chi_squared1 <- sum((observed_counts - expected_counts)^2 / expected_counts)
+  
+  return(chi_squared1)
+}
+
+# Initialize vector to store chi-squared values
+chi_squared_values1 <- numeric(length(sentences))
+
+# Loop over the sentences to calculate chi-squared values
+for (i in 1:length(sentences)) {
+  chi_squared_values1[i] <- calculate_chi_squared(sentences[i], letter_frequencies)
+}
+
+# Output chi-squared values for each sentence
+cat("Chi-Squared Values for Each Sentence:\n")
+print(chi_squared_values1)
+
+sum(1*(chi_squared_values>=22.930848))/length(chi_squared_values)
+sum(1*(chi_squared_values>=13.051050))/length(chi_squared_values)
+sum(1*(chi_squared_values>=46.285861))/length(chi_squared_values)
+sum(1*(chi_squared_values>=23.546278))/length(chi_squared_values)
+sum(1*(chi_squared_values>=23.676149))/length(chi_squared_values)
+sum(1*(chi_squared_values>=96.452677))/length(chi_squared_values)
+sum(1*(chi_squared_values>=28.271419))/length(chi_squared_values)
+sum(1*(chi_squared_values>=9.635023))/length(chi_squared_values)
+sum(1*(chi_squared_values>=44.928631))/length(chi_squared_values)
+sum(1*(chi_squared_values>=49.960559))/length(chi_squared_values)
+```
+Based on the calculated p-values for each sentence, the sentence with the smallest p-value is sentence 6: "Feeling vexed after an arduous and zany day at work, she hoped for a peaceful and quiet evening at home, cozying up after a quick dinner with some TV, or maybe a book on her upcoming visit to Auckland." The p-value for this sentence is 0.008776104.
+
+We believe that sentence 6 is the one produced by the LLM with the watermark. The significantly lower p-value indicates a substantial deviation from the expected letter distribution of normal English sentences. This suggests that the frequency of certain letters in sentence 6 has been manipulated in a way that creates a distinctive pattern, serving as a watermark. 
