@@ -1,0 +1,136 @@
+---
+title: "HW9"
+author: "Kelly Kim"
+date: "2024-04-17"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+# Part A
+# Step 1: Read the data
+turnout <- read.csv("turnout.csv")
+
+# Step 2: Preliminary analysis (Part A)
+# Proportion of GOTV call recipients who voted in 1998
+prop_gotv <- mean(turnout$voted1998[turnout$GOTV_call == 1])
+
+# Sample proportion of non-GOTV call recipients who voted in 1998
+prop_no_gotv <- mean(turnout$voted1998[turnout$GOTV_call == 0])
+
+# Confidence interval for the difference in proportions
+n_gotv <- sum(turnout$GOTV_call == 1)
+n_no_gotv <- sum(turnout$GOTV_call == 0)
+se_diff <- sqrt(prop_gotv*(1-prop_gotv)/n_gotv + prop_no_gotv*(1-prop_no_gotv)/n_no_gotv)
+margin_of_error <- 1.96 * se_diff
+ci_lower <- prop_gotv - prop_no_gotv - margin_of_error
+ci_upper <- prop_gotv - prop_no_gotv + margin_of_error
+
+print(prop_gotv)
+print(prop_no_gotv)
+print(paste("Confidence interval:", ci_lower, ",", ci_upper))
+```
+
+```{r}
+# Part B
+
+# Check the relationship between receiving a GOTV call and voted1996
+table(turnout$voted1996, turnout$GOTV_call)
+
+# Check the relationship between receiving a GOTV call and AGE
+summary(glm(GOTV_call ~ AGE, data = turnout, family = "binomial"))
+
+# Check the relationship between receiving a GOTV call and MAJORPTY
+table(turnout$MAJORPTY, turnout$GOTV_call)
+
+# Check the relationship between voted1996 and voted1998
+table(turnout$voted1996, turnout$voted1998)
+
+# Check the relationship between AGE and voted1998
+summary(glm(voted1998 ~ AGE, data = turnout, family = "binomial"))
+
+# Check the relationship between MAJORPTY and voted1998
+table(turnout$MAJORPTY, turnout$voted1998)
+```
+The logistic regression models indicate significant associations between AGE and both receiving a GOTV call (coefficient estimate = 0.0239, p < 0.001) and voting in 1998 (coefficient estimate = 0.0311, p < 0.001), suggesting that older individuals are more likely to receive a GOTV call and to vote in 1998. Additionally, the table displays a higher count of 1s in the 'voted1996 = 1' row compared to the 'voted1996 = 0' row, indicating that those who voted in 1996 are more likely to receive a GOTV call. Furthermore, there is an association between being registered as a member of a major U.S. political party (MAJORPTY) and receiving a GOTV call, as suggested by the table. If these variables are associated with both receiving a GOTV call and voting in 1998, they could act as confounders, potentially influencing the observed relationship between receiving a GOTV call and voting in 1998. Therefore, it is crucial to consider these variables in the analysis to account for their potential confounding effects.
+
+
+```{r}
+# Part C
+# Step 1: Install and load the Matching package
+library(Matching)
+
+# Step 2: Perform matching
+matched_data <- Match(Y = turnout$GOTV_call,
+                      Tr = turnout$voted1998,
+                      X = cbind(turnout$voted1996, turnout$AGE, turnout$MAJORPTY),
+                      M = 5)
+
+# Step 3: Extract matched data
+matched_turnout <- turnout[matched_data$index.treated, ]
+
+# Step 4: Check balance of potential confounders
+summary(matched_data)
+
+# Step 5: Analysis with matched data
+# Proportion of GOTV call recipients who voted in 1998
+matched_prop_gotv <- mean(matched_turnout$voted1998[matched_turnout$GOTV_call == 1])
+
+# Sample proportion of non-GOTV call recipients who voted in 1998
+matched_prop_no_gotv <- mean(matched_turnout$voted1998[matched_turnout$GOTV_call == 0])
+
+# Confidence interval for the difference in proportions
+matched_diff_prop <- matched_prop_gotv - matched_prop_no_gotv
+matched_se_diff <- sqrt((matched_prop_gotv * (1 - matched_prop_gotv) / sum(matched_turnout$GOTV_call == 1)) +
+                        (matched_prop_no_gotv * (1 - matched_prop_no_gotv) / sum(matched_turnout$GOTV_call == 0)))
+matched_margin_of_error <- 1.96 * matched_se_diff
+matched_ci_lower <- matched_diff_prop - matched_margin_of_error
+matched_ci_upper <- matched_diff_prop + matched_margin_of_error
+
+# Step 6: Print results
+cat("Proportion of GOTV call recipients who voted in 1998:", matched_prop_gotv, "\n")
+cat("Sample proportion of non-GOTV call recipients who voted in 1998:", matched_prop_no_gotv, "\n")
+cat("95% CI for the difference in proportions:", matched_ci_lower, "to", matched_ci_upper, "\n")
+```
+
+Based on the provided results, the estimated difference in proportions of voting in 1998 between those who received the GOTV call and those who didn't is 0.013321, with a standard error of 0.0041353 and a corresponding t-statistic of 3.2212, resulting in a p-value of 0.0012764. However, it's important to note that the 95% confidence interval for the difference in proportions ranges from 0 to 0, indicating that the difference is not statistically significant. Additionally, the proportions of both GOTV call recipients and non-recipients who voted in 1998 are 1, suggesting that there may be limitations or issues with the analysis. Therefore, based on these findings, the overall effect of the GOTV call on the likelihood of voting in the 1998 election appears to be inconclusive or negligible.
+```{r}
+library(ggplot2)
+
+# Load the dataset
+solder <- read.csv("solder.csv")
+
+# Part A
+# Plot 1: Relationship between opening size and skips
+ggplot(solder, aes(x = Opening, y = skips)) +
+  geom_boxplot(fill = "skyblue", color = "black") +
+  labs(title = "Relationship between Opening Size and Skips",
+       x = "Opening Size",
+       y = "Number of Skips")
+
+# Plot 2: Relationship between solder thickness and skips
+ggplot(solder, aes(x = Solder, y = skips)) +
+  geom_boxplot(fill = "purple", color = "black") +
+  labs(title = "Relationship between Solder Thickness and Skips",
+       x = "Solder Thickness",
+       y = "Number of Skips")
+```
+
+```{r}
+library(tidyverse)
+library(mosaic)
+# Part B
+model <- lm(skips ~ Opening + Solder + Solder:Opening, data = solder)
+coef(model) %>% round(0)
+confint(model)
+
+```
+
+Part C
+The coefficients suggest that increasing opening size and using thin solder are individually associated with more skips, while the interaction terms reveal nuanced effects. Specifically, the combination of medium opening size and thin solder is linked to fewer skips, whereas large opening size with thin solder leads to more skips than expected based on individual effects.
+
+Part D
+I recommend AT&T use small opening size and thick solder to minimize skips in the manufacturing process, based on the analysis indicating this combination has the lowest skip rate compared to others.
+
