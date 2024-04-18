@@ -6,6 +6,10 @@ output:
   pdf_document: default
   html_document: default
 ---
+HW9
+Kelly Kim
+UT EID: dk29933
+https://github.com/kellykim0127/SDS315/blob/main/HW9.Rmd
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -32,7 +36,10 @@ print(prop_gotv)
 print(prop_no_gotv)
 print(paste("Confidence interval:", ci_lower, ",", ci_upper))
 ```
-
+Problem 1, Part A:
+The proportion of those receiving a GOTV call who voted in 1998: 0.648
+The sample proportion of those not receiving a GOTV call who voted in 1998: 0.444
+confidence interval: 0.143, 0.264
 ```{r}
 # Part B
 
@@ -54,7 +61,7 @@ summary(glm(voted1998 ~ AGE, data = turnout, family = "binomial"))
 # Check the relationship between MAJORPTY and voted1998
 table(turnout$MAJORPTY, turnout$voted1998)
 ```
-The logistic regression models indicate significant associations between AGE and both receiving a GOTV call (coefficient estimate = 0.0239, p < 0.001) and voting in 1998 (coefficient estimate = 0.0311, p < 0.001), suggesting that older individuals are more likely to receive a GOTV call and to vote in 1998. Additionally, the table displays a higher count of 1s in the 'voted1996 = 1' row compared to the 'voted1996 = 0' row, indicating that those who voted in 1996 are more likely to receive a GOTV call. Furthermore, there is an association between being registered as a member of a major U.S. political party (MAJORPTY) and receiving a GOTV call, as suggested by the table. If these variables are associated with both receiving a GOTV call and voting in 1998, they could act as confounders, potentially influencing the observed relationship between receiving a GOTV call and voting in 1998. Therefore, it is crucial to consider these variables in the analysis to account for their potential confounding effects.
+Problem 1, Part B: The logistic regression models indicate significant associations between AGE and both receiving a GOTV call (coefficient estimate = 0.0239, p < 0.001) and voting in 1998 (coefficient estimate = 0.0311, p < 0.001), suggesting that older individuals are more likely to receive a GOTV call and to vote in 1998. Additionally, the table displays a higher count of 1s in the 'voted1996 = 1' row compared to the 'voted1996 = 0' row, indicating that those who voted in 1996 are more likely to receive a GOTV call. Furthermore, there is an association between being registered as a member of a major U.S. political party (MAJORPTY) and receiving a GOTV call, as suggested by the table. If these variables are associated with both receiving a GOTV call and voting in 1998, they could act as confounders, potentially influencing the observed relationship between receiving a GOTV call and voting in 1998. Therefore, it is crucial to consider these variables in the analysis to account for their potential confounding effects.
 
 
 ```{r}
@@ -95,7 +102,7 @@ cat("Sample proportion of non-GOTV call recipients who voted in 1998:", matched_
 cat("95% CI for the difference in proportions:", matched_ci_lower, "to", matched_ci_upper, "\n")
 ```
 
-Based on the provided results, the estimated difference in proportions of voting in 1998 between those who received the GOTV call and those who didn't is 0.013321, with a standard error of 0.0041353 and a corresponding t-statistic of 3.2212, resulting in a p-value of 0.0012764. However, it's important to note that the 95% confidence interval for the difference in proportions ranges from 0 to 0, indicating that the difference is not statistically significant. Additionally, the proportions of both GOTV call recipients and non-recipients who voted in 1998 are 1, suggesting that there may be limitations or issues with the analysis. Therefore, based on these findings, the overall effect of the GOTV call on the likelihood of voting in the 1998 election appears to be inconclusive or negligible.
+Problem 1, Part C: Based on the provided results, the estimated difference in proportions of voting in 1998 between those who received the GOTV call and those who didn't is 0.013321, with a standard error of 0.0041353 and a corresponding t-statistic of 3.2212, resulting in a p-value of 0.0012764. However, it's important to note that the 95% confidence interval for the difference in proportions ranges from 0 to 0, indicating that the difference is not statistically significant. Additionally, the proportions of both GOTV call recipients and non-recipients who voted in 1998 are 1, suggesting that there may be limitations or issues with the analysis. Therefore, based on these findings, the overall effect of the GOTV call on the likelihood of voting in the 1998 election appears to be inconclusive or negligible.
 ```{r}
 library(ggplot2)
 
@@ -128,9 +135,9 @@ confint(model)
 
 ```
 
-Part C
+Problem 2, Part C
 The coefficients suggest that increasing opening size and using thin solder are individually associated with more skips, while the interaction terms reveal nuanced effects. Specifically, the combination of medium opening size and thin solder is linked to fewer skips, whereas large opening size with thin solder leads to more skips than expected based on individual effects.
 
-Part D
+Problem 2, Part D
 I recommend AT&T use small opening size and thick solder to minimize skips in the manufacturing process, based on the analysis indicating this combination has the lowest skip rate compared to others.
 
