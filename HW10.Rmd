@@ -113,6 +113,8 @@ ggplot(num_stores_per_product, aes(x = num_stores, y = Product)) +
 
 ```{r}
 # Part C
+model_C <- lm(Price ~ Type + Product, data = groceries)
+
 # Extract coefficients and standard errors
 coef_summary <- summary(model_C)$coefficients
 
