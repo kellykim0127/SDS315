@@ -199,11 +199,11 @@ std_coeff_income <- coef(summary(model_F))["Income10K", "Estimate"] / sd(groceri
 std_coeff_income
 
 ```
+Interpretation of the Income10K coefficient:
 Since the coefficient for Income10K is negative (-0.014090), it suggests that as income increases by $10,000, the price of the product tends to decrease. In other words, consumers in ZIP codes with higher incomes tend to pay less for the same product, on average.
-
 However, the p-value for Income10K is greater than the conventional significance level of 0.05 (p-value = 0.144239). Therefore, we cannot reject the null hypothesis that the coefficient for Income10K is equal to zero. This indicates that the relationship between income and price may not be statistically significant at the 0.05 level.
 
+Size of the effect of Income10K on Price:
 Since the coefficient for Income10K is standardized, a one-standard deviation increase in income corresponds to a change of -0.003094015 standard deviations in the price of the product.
 
 A one-standard deviation increase in the income of a ZIP code seems to be associated with a decrease of approximately 0.003 standard deviations in the price that consumers in that ZIP code expect to pay for the same product.
-
