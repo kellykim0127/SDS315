@@ -2,9 +2,15 @@
 title: "HW10"
 author: "Kelly Kim"
 date: "2024-04-23"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
+HW10
+Kelly Kim
+UT EID: dk29933
+https://github.com/kellykim0127/SDS315/blob/main/HW10.Rmd
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
@@ -58,11 +64,6 @@ The coefficients for age and income were not statistically significant at conven
 4) Conclusion:
 In conclusion, the analysis indicates a significant positive association between the percentage of minority residents in a ZIP code and the number of FAIR policies issued per 100 housing units. This finding suggests potential disparities in access to the private home insurance market based on racial/ethnic composition. However, further investigation is necessary to understand the underlying mechanisms and to determine whether these associations are indicative of discriminatory practices such as redlining in the insurance industry. Additionally, exploring interactions between variables or considering additional factors may provide a more comprehensive understanding of insurance access and demographic characteristics in Chicago ZIP codes. Confidence intervals were not provided in the report but could be calculated to provide a measure of uncertainty around the coefficient estimates.
 
-
-
-
-
-
 ```{r}
 # Problem 2
 # Load necessary libraries
@@ -81,11 +82,12 @@ avg_price_by_store <- groceries %>%
   summarise(avg_price = mean(Price))
 
 # Make a bar graph
-ggplot(avg_price_by_store, aes(y = Store, x = avg_price)) +
+# Make a bar graph
+ggplot(avg_price_by_store, aes(x = Store, y = avg_price)) +
   geom_bar(stat = "identity") +
   labs(title = "Average Price of Products Across Different Stores",
-       x = "Average Price",
-       y = "Store") +
+       x = "Store",
+       y = "Average Price of Products Sold at that Store ") +
   coord_flip()
 
 
@@ -99,41 +101,37 @@ num_stores_per_product <- groceries %>%
   summarise(num_stores = n_distinct(Store))
 
 # Make a bar graph
-ggplot(num_stores_per_product, aes(x = Product, y = num_stores)) +
+ggplot(num_stores_per_product, aes(x = num_stores, y = Product)) +
   geom_bar(stat = "identity") +
   labs(title = "Number of Stores Selling Each Product",
-       x = "Product",
-       y = "Number of Stores") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+       x = "Number of Stores Selling the Product",
+       y = "Product") +
+  theme(axis.text.y = element_text(hjust = 0.5))  # Centering the product names
+
 
 ```
 
 ```{r}
 # Part C
-# Fit regression model
-model_C <- lm(Price ~ Type + Product, data = groceries)
+# Extract coefficients and standard errors
+coef_summary <- summary(model_C)$coefficients
 
-# Get coefficients
-summary(model_C)
-# Coefficient Estimate for TypeConvenience
-coef_estimate <- -0.66426
+# Get coefficient estimate for Convenience stores
+coef_estimate <- coef_summary["TypeGrocery", "Estimate"]
 
-# Standard Error
-std_error <- 0.12765
+# Get standard error for Convenience stores
+std_error <- coef_summary["TypeGrocery", "Std. Error"]
 
-# Critical value (z-value) for 95% confidence interval
-critical_value <- 1.96
-
-# Calculate confidence interval
-lower_bound <- coef_estimate - critical_value * std_error
-upper_bound <- coef_estimate + critical_value * std_error
+# Calculate the lower and upper bounds for the confidence interval
+lower_bound <- coef_estimate - 1.96 * std_error
+upper_bound <- coef_estimate + 1.96 * std_error
 
 # Round the results to two decimal places
 lower_bound <- round(lower_bound, 2)
 upper_bound <- round(upper_bound, 2)
 
 # Print the results
-cat("The 95% confidence interval for the price difference between convenience stores and ordinary grocery stores is approximately between $", lower_bound, "and $", upper_bound, ".\n")
+cat("Compared with ordinary grocery stores (like Albertsons, HEB, or Krogers), convenience stores charge somewhere between $", lower_bound, "and $", upper_bound, "more for the same product.\n")
 
 ```
 
@@ -207,3 +205,4 @@ Size of the effect of Income10K on Price:
 Since the coefficient for Income10K is standardized, a one-standard deviation increase in income corresponds to a change of -0.003094015 standard deviations in the price of the product.
 
 A one-standard deviation increase in the income of a ZIP code seems to be associated with a decrease of approximately 0.003 standard deviations in the price that consumers in that ZIP code expect to pay for the same product.
+
