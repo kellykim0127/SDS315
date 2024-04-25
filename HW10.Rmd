@@ -1,0 +1,209 @@
+---
+title: "HW10"
+author: "Kelly Kim"
+date: "2024-04-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r}
+# Problem 1
+redline_data <- read.csv("redlining.csv")
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+
+# View the structure of your dataset
+str(redline_data)
+
+# Check summary statistics
+summary(redline_data)
+
+# Perform linear regression
+lm_model <- lm(policies ~ minority + fire + age + income, data = redline_data)
+
+# View the summary of the regression model
+summary(lm_model)
+
+# Interpret the coefficients and assess significance
+
+# Plot residuals vs. fitted values
+plot(lm_model, which = 1)
+
+# Plot normal Q-Q plot of residuals
+plot(lm_model, which = 2)
+
+# Plot standardized residuals vs. theoretical quantiles
+plot(lm_model, which = 3)
+
+# Plot square root of standardized residuals vs. fitted values
+plot(lm_model, which = 5)
+
+```
+1) Question:
+The main question addressed in this analysis is whether there is an association between the number of FAIR policies (a proxy for access to the private home insurance market) and the racial/ethnic composition of ZIP codes in Chicago, while controlling for other factors such as fire incidence, age of housing units, and median family income.
+
+2) Approach:
+To answer this question, a linear regression model was utilized. The linear regression model allows for the examination of the relationship between the dependent variable (FAIR policies) and several independent variables (minority percentage, fire incidence, age of housing units, and median family income) while adjusting for the effects of the other variables.
+
+3) Results:
+The results of the linear regression analysis are as follows:
+
+The coefficient for minority was estimated to be 0.0084 with a standard error of 0.0029, indicating that for every one-unit increase in the percentage of minority residents in a ZIP code, the number of FAIR policies increases by approximately 0.0084 per 100 housing units. This coefficient was found to be statistically significant at the 0.01 level, suggesting a significant positive association between minority percentage and the number of FAIR policies.
+The coefficient for fire was estimated to be 0.0217 with a standard error of 0.0088, indicating that for every one-unit increase in the number of fires per 100 housing units, the number of FAIR policies increases by approximately 0.0217 per 100 housing units. This coefficient was also statistically significant at the 0.05 level.
+The coefficients for age and income were not statistically significant at conventional levels (p > 0.05), suggesting that age of housing units and median family income may not have a significant independent effect on the number of FAIR policies when considering other variables in the model.
+4) Conclusion:
+In conclusion, the analysis indicates a significant positive association between the percentage of minority residents in a ZIP code and the number of FAIR policies issued per 100 housing units. This finding suggests potential disparities in access to the private home insurance market based on racial/ethnic composition. However, further investigation is necessary to understand the underlying mechanisms and to determine whether these associations are indicative of discriminatory practices such as redlining in the insurance industry. Additionally, exploring interactions between variables or considering additional factors may provide a more comprehensive understanding of insurance access and demographic characteristics in Chicago ZIP codes. Confidence intervals were not provided in the report but could be calculated to provide a measure of uncertainty around the coefficient estimates.
+
+
+
+
+
+
+```{r}
+# Problem 2
+# Load necessary libraries
+library(tidyverse)
+
+# Load the data
+groceries <- read.csv("groceries.csv")
+
+# Display the structure of the data
+str(groceries)
+
+# Part A
+# Calculate the average price of products sold at each store
+avg_price_by_store <- groceries %>%
+  group_by(Store) %>%
+  summarise(avg_price = mean(Price))
+
+# Make a bar graph
+ggplot(avg_price_by_store, aes(y = Store, x = avg_price)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Average Price of Products Across Different Stores",
+       x = "Average Price",
+       y = "Store") +
+  coord_flip()
+
+
+```
+
+```{r}
+# Part B
+# Count the number of stores selling each product
+num_stores_per_product <- groceries %>%
+  group_by(Product) %>%
+  summarise(num_stores = n_distinct(Store))
+
+# Make a bar graph
+ggplot(num_stores_per_product, aes(x = Product, y = num_stores)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Number of Stores Selling Each Product",
+       x = "Product",
+       y = "Number of Stores") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+```
+
+```{r}
+# Part C
+# Fit regression model
+model_C <- lm(Price ~ Type + Product, data = groceries)
+
+# Get coefficients
+summary(model_C)
+# Coefficient Estimate for TypeConvenience
+coef_estimate <- -0.66426
+
+# Standard Error
+std_error <- 0.12765
+
+# Critical value (z-value) for 95% confidence interval
+critical_value <- 1.96
+
+# Calculate confidence interval
+lower_bound <- coef_estimate - critical_value * std_error
+upper_bound <- coef_estimate + critical_value * std_error
+
+# Round the results to two decimal places
+lower_bound <- round(lower_bound, 2)
+upper_bound <- round(upper_bound, 2)
+
+# Print the results
+cat("The 95% confidence interval for the price difference between convenience stores and ordinary grocery stores is approximately between $", lower_bound, "and $", upper_bound, ".\n")
+
+```
+
+```{r}
+# Part D
+# Fit regression model
+model_D <- lm(Price ~ Store + Product, data = groceries)
+
+# Get coefficients
+coefficients <- coef(summary(model_D))
+
+# Extract coefficients for stores
+store_coefficients <- coefficients[grep("^Store", rownames(coefficients)), "Estimate"]
+
+# Remove the intercept coefficient
+store_coefficients <- store_coefficients[!names(store_coefficients) %in% "(Intercept)"]
+
+# Identify the two stores with the lowest coefficients (lowest prices)
+store_lowest <- names(sort(store_coefficients)[1:2])
+
+# Identify the two stores with the highest coefficients (highest prices)
+store_highest <- names(sort(store_coefficients, decreasing = TRUE)[1:2])
+
+# Display the results
+store_lowest
+store_highest
+
+```
+
+```{r}
+# Part E
+coefficients_D <- coef(model_D)
+
+coefficients_D
+
+```
+In the model output, each coefficient represents the change in price associated with a one-unit change in the corresponding predictor variable, holding all other variables constant. Specifically, the coefficient for StoreCentral Market is -0.57338651, which suggests that, on average, the price for products at Central Market is approximately $0.57 lower compared to the reference category (which is not explicitly shown but is usually the first category listed, likely "Albertsons" or similar).
+
+The coefficient for StoreH-E-B is -0.64595932, indicating that the price for products at H-E-B is approximately $0.65 lower compared to the reference category.
+
+Comparing these coefficients, we see that the price difference between Central Market and H-E-B is relatively small (about $0.08). This suggests that Central Market does not significantly charge more than H-E-B for the same product, at least based on the data and model you've provided.
+
+To put this difference into context, you could also examine the magnitude of price differences between other pairs of stores in your dataset to see how they compare to the difference between Central Market and H-E-B.
+
+```{r}
+# Part F
+# Load required library
+library(dplyr)
+
+# Step 1: Create Income10K variable
+groceries <- mutate(groceries, Income10K = Income / 10000)
+
+# Step 2: Fit regression model
+model_F <- lm(Price ~ Product + Income10K, data = groceries)
+
+# Step 3: Interpret coefficients
+summary(model_F)
+
+# Calculate standardized coefficient for Income10K
+std_coeff_income <- coef(summary(model_F))["Income10K", "Estimate"] / sd(groceries$Income10K)
+
+# Display standardized coefficient
+std_coeff_income
+
+```
+Since the coefficient for Income10K is negative (-0.014090), it suggests that as income increases by $10,000, the price of the product tends to decrease. In other words, consumers in ZIP codes with higher incomes tend to pay less for the same product, on average.
+
+However, the p-value for Income10K is greater than the conventional significance level of 0.05 (p-value = 0.144239). Therefore, we cannot reject the null hypothesis that the coefficient for Income10K is equal to zero. This indicates that the relationship between income and price may not be statistically significant at the 0.05 level.
+
+Since the coefficient for Income10K is standardized, a one-standard deviation increase in income corresponds to a change of -0.003094015 standard deviations in the price of the product.
+
+A one-standard deviation increase in the income of a ZIP code seems to be associated with a decrease of approximately 0.003 standard deviations in the price that consumers in that ZIP code expect to pay for the same product.
+
